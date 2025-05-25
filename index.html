@@ -279,7 +279,7 @@
   <!-- Botão de volume fixo -->
   <div id="volumeButtonWrapper" aria-label="Controle de volume">
     <img id="volumeIcon" src="https://img.icons8.com/ios-filled/50/ffffff/medium-volume.png" alt="Volume" />
-    <input type="range" id="volumeSliderFixed" min="0" max="1" step="0.01" value="1" aria-label="Controle de volume" />
+   <input type="range" id="volumeSliderFixed" min="0" max="1" step="0.01" value="0.4" aria-label="Controle de volume" />
   </div>
 
   <!-- Overlay -->
@@ -322,15 +322,19 @@
       </button>
     </div>
     <div id="currentTrackName">Música #01</div>
-    <input
-      type="range"
-      id="volumeSlider"
-      min="0"
-      max="1"
-      step="0.01"
-      value="1"
-      aria-label="Controle de volume"
-      style="display: none;"
+  <input
+  type="range"
+  id="volumeSlider"
+  min="0"
+  max="1"
+  step="0.01"
+  value="0.4"
+  aria-label="Controle de volume"
+  style="display: none;"
+/>
+
+/>
+
     />
   </div>
 
@@ -420,7 +424,7 @@
     });
 
     // Inicia com volume 1
-    audio.volume = 1;
+    audio.volume = 0.3;
 
     // Overlay desaparece ao clicar e começa a tocar música
 overlay.addEventListener('click', () => {
@@ -450,58 +454,82 @@ overlay.addEventListener('click', () => {
     animateColorWord();
 
     // Canvas partículas
-    const canvas = document.getElementById('particleCanvas');
-    const ctx = canvas.getContext('2d');
-    let particlesArray = [];
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+  const canvas = document.getElementById('particleCanvas');
+  const ctx = canvas.getContext('2d');
+  let particlesArray = [];
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 2 + 1;
+      this.speedX = (Math.random() - 0.5) * 1;
+      this.speedY = (Math.random() - 0.5) * 1;
     }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
 
-    class Particle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 1;
-        this.speedX = (Math.random() - 0.5) * 0.7;
-        this.speedY = (Math.random() - 0.5) * 0.7;
-        this.color = `hsl(${Math.random() * 360}, 70%, 70%)`;
-      }
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
+      if (this.x < 0 || this.x > canvas.width) this.speedX = -this.speedX;
+      if (this.y < 0 || this.y > canvas.height) this.speedY = -this.speedY;
+    }
+    draw() {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
 
-        if (this.x < 0 || this.x > canvas.width) this.speedX = -this.speedX;
-        if (this.y < 0 || this.y > canvas.height) this.speedY = -this.speedY;
-      }
-      draw() {
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
+  function initParticles() {
+    particlesArray = [];
+    for(let i = 0; i < 300; i++) {
+      particlesArray.push(new Particle());
+    }
+  }
+  initParticles();
+
+  function connectParticles() {
+    let opacityValue = 1;
+    for (let a = 0; a < particlesArray.length; a++) {
+      for (let b = a; b < particlesArray.length; b++) {
+        let dx = particlesArray[a].x - particlesArray[b].x;
+        let dy = particlesArray[a].y - particlesArray[b].y;
+        let distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 100) {
+          opacityValue = 1 - distance / 100;
+          ctx.strokeStyle = `rgba(255,255,255,${opacityValue})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+          ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+          ctx.stroke();
+        }
       }
     }
+  }
 
-    function initParticles() {
-      particlesArray = [];
-      for(let i = 0; i < 100; i++) {
-        particlesArray.push(new Particle());
-      }
-    }
-    initParticles();
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particlesArray.forEach(p => {
+      p.update();
+      p.draw();
+    });
+    connectParticles();
+    requestAnimationFrame(animateParticles);
+  }
+  animateParticles();
 
-    function animateParticles() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particlesArray.forEach(p => {
-        p.update();
-        p.draw();
-      });
-      requestAnimationFrame(animateParticles);
-    }
-    animateParticles();
+
 
     const titleText = "raid7xyz";
 let titleIndex = 0;
@@ -536,7 +564,7 @@ window.addEventListener("load", () => {
   typeTitleLoop();
 });
 
-  </script>
+</script>
 
 </body>
 </html>
