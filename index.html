@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="utf-8" />
-  <title>raid7xyz</title>
+  <title> </title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" href="https://img.icons8.com/?size=100&id=11260&format=png&color=000000" type="image/png" />
   <style>
@@ -293,7 +293,7 @@
   </header>
 
   <div class="button-container">
-    <a href="https://discord.com/users/51529616690380952" class="btn-link" target="_blank" rel="noopener">
+    <a href="https://discord.gg/WCpWARjb5W" class="btn-link" target="_blank" rel="noopener">
       <img src="https://img.icons8.com/?size=512&id=30888&format=png&color=000000" alt="Discord" />
       Discord
     </a>
@@ -502,6 +502,39 @@ overlay.addEventListener('click', () => {
       requestAnimationFrame(animateParticles);
     }
     animateParticles();
+
+    const titleText = "raid7xyz";
+let titleIndex = 0;
+let isDeleting = false;
+const typingSpeed = 150;      // velocidade de digitação
+const deletingSpeed = 80;     // velocidade de apagar
+const delayAfterTyping = 1200; // pausa depois de digitar completo
+
+function typeTitleLoop() {
+  if (!isDeleting) {
+    titleIndex++;
+    document.title = titleText.substring(0, titleIndex);
+    if (titleIndex === titleText.length) {
+      setTimeout(() => {
+        isDeleting = true;
+        typeTitleLoop();
+      }, delayAfterTyping);
+      return;
+    }
+  } else {
+    titleIndex--;
+    // Evitar título vazio para não aparecer "index.html"
+    document.title = titleIndex > 0 ? titleText.substring(0, titleIndex) : titleText;
+    if (titleIndex === 0) {
+      isDeleting = false;
+    }
+  }
+  setTimeout(typeTitleLoop, isDeleting ? deletingSpeed : typingSpeed);
+}
+
+window.addEventListener("load", () => {
+  typeTitleLoop();
+});
 
   </script>
 
