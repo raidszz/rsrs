@@ -287,10 +287,17 @@
     Clique para acessar!
   </div>
 
-  <header>
-    <img src="https://i.pinimg.com/736x/c2/47/75/c24775403f7acf588d65086de303ea4e.jpg" alt="avatar" />
-    <h1>@raidszz</h1>
-  </header>
+<header>
+  <div id="discord-profile" style="display: flex; flex-direction: column; align-items: center;">
+ <img src="xxx.png" alt="xxx.png" width="200" height="200" />
+    <h1 id="discord-username">@raidszz</h1>
+    <div id="discord-status" style="margin-top: 5px; font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+      <span id="status-indicator" style="width: 12px; height: 12px; border-radius: 50%; display: inline-block; background: gray;"></span>
+      <span id="status-text">Offline</span>
+    </div>
+  </div>
+</header>
+
 
   <div class="button-container">
     <a href="https://discord.gg/WCpWARjb5W" class="btn-link" target="_blank" rel="noopener">
@@ -561,6 +568,62 @@ function typeTitleLoop() {
 window.addEventListener("load", () => {
   typeTitleLoop();
 });
+
+const discordUserId = '751529616690380952'; // Seu User ID do Discord
+
+async function fetchDiscordStatus() {
+  try {
+    const res = await fetch(`https://api.lanyard.rest/v1/users/${discordUserId}`);
+    if (!res.ok) throw new Error('Erro ao buscar dados do Discord');
+
+    const data = await res.json();
+    const discord = data.data;
+
+    // Atualizar avatar (atualize seu HTML para ter esta img, se quiser)
+    // Exemplo: <img id="discord-avatar" src="xxx.png" alt="Avatar" width="200" height="200" />
+    const avatarElement = document.getElementById('discord-avatar');
+    if (avatarElement) {
+      const avatarUrl = `https://cdn.discordapp.com/avatars/${discord.id}/${discord.avatar}?size=256`;
+      avatarElement.src = avatarUrl;
+    }
+
+    // Atualizar nome (no seu HTML está em #discord-username)
+    const username = discord.discord_user.username;
+    const discriminator = discord.discord_user.discriminator;
+    document.getElementById('discord-username').textContent = `${username}#${discriminator}`;
+
+    // Atualizar status
+    const status = discord.discord_status; // Pode ser: online, offline, idle, dnd
+
+    const statusColors = {
+      online: '#43b581', // verde
+      idle: '#faa61a',   // amarelo
+      dnd: '#f04747',    // vermelho
+      offline: '#747f8d' // cinza
+    };
+
+    const statusTexts = {
+      online: 'Online',
+      idle: 'Ausente',
+      dnd: 'Não perturbe',
+      offline: 'Offline'
+    };
+
+    const statusIndicator = document.getElementById('status-indicator');
+    const statusText = document.getElementById('status-text');
+
+    statusIndicator.style.background = statusColors[status] || statusColors.offline;
+    statusText.textContent = statusTexts[status] || 'Offline';
+
+  } catch (error) {
+    console.error('Erro ao buscar status do Discord:', error);
+  }
+}
+
+// Atualiza o status a cada 30 segundos
+fetchDiscordStatus();
+setInterval(fetchDiscordStatus, 10000);
+
 
 </script>
 
