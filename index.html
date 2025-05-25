@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>raid7xyz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+      overflow: hidden;
+      position: relative;
+      z-index: 0;
+    }
+    header {
+      margin-bottom: 40px;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+    header img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #333;
+      box-shadow: 0 0 12px #222;
+      margin-bottom: 15px;
+      transition: transform 0.3s ease;
+    }
+    header img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #555;
+    }
+    header h1 {
+      font-weight: 700;
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+      margin: 0;
+      color: #f5f5f5;
+      text-shadow: 0 0 5px #000;
+    }
+    .button-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 600px;
+      width: 100%;
+      position: relative;
+      z-index: 10;
+    }
+    .btn-link {
+      background: #1e1e1e;
+      border: 2px solid transparent;
+      border-radius: 30px;
+      color: #ddd;
+      padding: 15px 25px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+      transition: all 0.3s ease;
+      user-select: none;
+      flex: 1 1 180px;
+      max-width: 220px;
+      justify-content: center;
+    }
+    .btn-link img {
+      width: 32px;
+      height: 32px;
+      filter: brightness(0) invert(1);
+      transition: transform 0.3s ease;
+    }
+    .btn-link:hover {
+      background: #333;
+      border-color: #fff;
+      box-shadow: 0 6px 20px rgba(255,255,255,0.2);
+      transform: translateY(-5px);
+      color: #fff;
+    }
+    .btn-link:hover img {
+      transform: scale(1.2);
+      filter: brightness(1) invert(0);
+    }
+    .audio-controls {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+      z-index: 10;
+    }
+    .button-group {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+    .audio-button,
+    .next-button,
+    .prev-button {
+      background: #1e1e1e;
+      border: 2px solid transparent;
+      border-radius: 30px;
+      color: #ddd;
+      padding: 15px 25px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+      transition: all 0.3s ease;
+      user-select: none;
+      max-width: 120px;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .audio-button {
+      width: 120px;
+      justify-content: center;
+      padding: 15px 0;
+      border-radius: 50px;
+    }
+    .audio-button img,
+    .next-button img,
+    .prev-button img {
+      width: 28px;
+      height: 28px;
+      filter: brightness(0) invert(1);
+      transition: transform 0.3s ease, filter 0.3s ease;
+    }
+    .audio-button:hover,
+    .next-button:hover,
+    .prev-button:hover {
+      background: #333;
+      border-color: #fff;
+      box-shadow: 0 6px 20px rgba(255,255,255,0.2);
+      transform: translateY(-5px);
+      color: #fff;
+    }
+    .audio-button:hover img,
+    .next-button:hover img,
+    .prev-button:hover img {
+      transform: scale(1.2);
+      filter: brightness(1) invert(0);
+    }
+    .next-button,
+    .prev-button {
+      font-size: 1rem;
+      padding: 12px 20px;
+    }
+    #currentTrackName {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #ddd;
+      text-align: center;
+      max-width: 320px;
+      word-wrap: break-word;
+      text-shadow: 0 0 5px #000;
+      user-select: none;
+      position: relative;
+      z-index: 10;
+    }
+    /* Overlay */
+    #overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(18,18,18,0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #eee;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      user-select: none;
+      z-index: 9999;
+      text-align: center;
+      padding: 0 20px;
+      transition: opacity 0.5s ease;
+    }
+
+    /* Botão de volume fixo no topo esquerdo */
+    #volumeButtonWrapper {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background: rgba(30,30,30,0.8);
+      border-radius: 30px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.8);
+      user-select: none;
+      z-index: 10000;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    #volumeButtonWrapper:hover {
+      background: rgba(50,50,50,0.9);
+    }
+    #volumeButtonWrapper img {
+      width: 24px;
+      height: 24px;
+      filter: brightness(0) invert(1);
+      transition: filter 0.3s ease;
+    }
+    #volumeSliderFixed {
+      width: 120px;
+      cursor: pointer;
+      background: #333;
+      border-radius: 10px;
+      height: 6px;
+      outline: none;
+    }
+
+    /* Canvas partículas atrás */
+    #particleCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Canvas partículas -->
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- Botão de volume fixo -->
+  <div id="volumeButtonWrapper" aria-label="Controle de volume">
+    <img id="volumeIcon" src="https://img.icons8.com/ios-filled/50/ffffff/medium-volume.png" alt="Volume" />
+    <input type="range" id="volumeSliderFixed" min="0" max="1" step="0.01" value="1" aria-label="Controle de volume" />
+  </div>
+
+  <!-- Overlay -->
+  <div id="overlay" aria-label="Clique para acessar o site e tocar a música">
+    Clique para acessar!
+  </div>
+
+  <header>
+    <img src="https://i.pinimg.com/736x/c2/47/75/c24775403f7acf588d65086de303ea4e.jpg" alt="avatar" />
+    <h1>@raidszz</h1>
+  </header>
+
+  <div class="button-container">
+    <a href="https://discord.com/users/51529616690380952" class="btn-link" target="_blank" rel="noopener">
+      <img src="https://img.icons8.com/?size=512&id=30888&format=png&color=000000" alt="Discord" />
+      Discord
+    </a>
+    <a href="https://open.spotify.com/user/31thx2wazmntrk5hhl6cpdiimcq4" class="btn-link" target="_blank" rel="noopener">
+      <img src="https://img.icons8.com/?size=512&id=11116&format=png&color=000000" alt="Spotify" />
+      Spotify
+    </a>
+    <a href="https://www.instagram.com/raidszz" class="btn-link" target="_blank" rel="noopener">
+      <img src="https://img.icons8.com/?size=512&id=32309&format=png&color=000000" alt="Instagram" />
+      Instagram
+    </a>
+  </div>
+
+  <audio id="meuAudio" loop>
+    <source src="topmusicas.mp3" type="audio/mpeg" />
+    Seu navegador não suporta o elemento de áudio.
+  </audio>
+
+  <div class="audio-controls" aria-hidden="true">
+    <div class="button-group">
+      <button class="prev-button" onclick="prevTrack()" aria-label="Música anterior">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/rewind--v1.png" alt="Anterior" />
+      </button>
+
+      <button class="audio-button" onclick="togglePlay()" aria-label="Tocar/Pausar música" id="playPauseBtn">
+        <img id="audioIcon" src="https://img.icons8.com/ios-filled/50/ffffff/play--v1.png" alt="Play" />
+      </button>
+
+      <button class="next-button" onclick="nextTrack()" aria-label="Próxima música">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/fast-forward--v1.png" alt="Próxima" />
+      </button>
+    </div>
+
+    <div id="currentTrackName" aria-live="polite" aria-atomic="true"></div>
+  </div>
+
+  <script>
+    const audio = document.getElementById('meuAudio');
+    const audioIcon = document.getElementById('audioIcon');
+    const overlay = document.getElementById('overlay');
+    const currentTrackNameDiv = document.getElementById('currentTrackName');
+    const volumeSliderFixed = document.getElementById('volumeSliderFixed');
+    const volumeIcon = document.getElementById('volumeIcon');
+
+    const playlist = [
+      { src: 'topfodas.mp3', name: 'Return to Zero Возвращайся Beztebya' },
+      { src: 'Molchat Doma-Судно.mp3', name: 'Molchat Doma - Судно' },
+      { src: 'Hard-Times-Hoodtrap.mp3', name: 'Hard Times x Hoodtrap' }
+    ];
+
+    let currentTrackIndex = 0;
+
+    function loadTrack(index) {
+      audio.src = playlist[index].src;
+      currentTrackNameDiv.textContent = playlist[index].name;
+    }
+
+    function playAudio() {
+      audio.play();
+      audioIcon.src = "https://img.icons8.com/ios-filled/50/ffffff/pause--v1.png";
+      audioIcon.alt = "Pause";
+    }
+
+    function pauseAudio() {
+      audio.pause();
+      audioIcon.src = "https://img.icons8.com/ios-filled/50/ffffff/play--v1.png";
+      audioIcon.alt = "Play";
+    }
+
+    function togglePlay() {
+      if (audio.paused) {
+        playAudio();
+      } else {
+        pauseAudio();
+      }
+    }
+
+    function nextTrack() {
+      currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+      loadTrack(currentTrackIndex);
+      playAudio();
+    }
+
+    function prevTrack() {
+      currentTrackIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
+      loadTrack(currentTrackIndex);
+      playAudio();
+    }
+
+    function setVolume(value) {
+      audio.volume = value;
+      updateVolumeIcon(value);
+    }
+
+    function updateVolumeIcon(value) {
+      if (value == 0) {
+        volumeIcon.src = "https://img.icons8.com/ios-filled/50/ffffff/mute--v1.png";
+        volumeIcon.alt = "Mudo";
+      } else if (value < 0.5) {
+        volumeIcon.src = "https://img.icons8.com/ios-filled/50/ffffff/medium-volume.png";
+        volumeIcon.alt = "Volume médio";
+      } else {
+        volumeIcon.src = "https://img.icons8.com/ios-filled/50/ffffff/high-volume.png";
+        volumeIcon.alt = "Volume alto";
+      }
+    }
+
+    overlay.addEventListener('click', () => {
+      overlay.style.display = 'none';
+      loadTrack(currentTrackIndex);
+      playAudio();
+    });
+
+    // Controla volume pelo slider fixo
+    volumeSliderFixed.addEventListener('input', (e) => {
+      setVolume(e.target.value);
+    });
+
+    // Inicialização
+    setVolume(1);
+    loadTrack(currentTrackIndex);
+
+    // Atualiza ícone de play/pause se o áudio terminar
+    audio.addEventListener('ended', () => {
+      nextTrack();
+    });
+
+    // === PARTICULAS CANVAS (fundo) ===
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let particlesArray = [];
+    let maxParticles = 100;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.radius = Math.random() * 2 + 1;
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.speedY = (Math.random() - 0.5) * 0.5;
+        this.alpha = Math.random() * 0.5 + 0.1;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (this.x < 0 || this.x > canvas.width) this.speedX = -this.speedX;
+        if (this.y < 0 || this.y > canvas.height) this.speedY = -this.speedY;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      particlesArray = [];
+      for (let i = 0; i < maxParticles; i++) {
+        particlesArray.push(new Particle());
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let p of particlesArray) {
+        p.update();
+        p.draw();
+      }
+      requestAnimationFrame(animate);
+    }
+
+    initParticles();
+    animate();
+  </script>
+</body>
+</html>

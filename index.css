@@ -1,0 +1,315 @@
+/* Reset básico para body e html */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Open Sans', sans-serif;
+  color: #000000;
+  height: 100%;
+  position: relative;
+  background: url("https://i.pinimg.com/736x/c2/47/75/c24775403f7acf588d65086de303ea4e.jpg") no-repeat center center fixed;
+  background-size: cover;
+  overflow-x: hidden;
+}
+
+/* Overlay escuro sobre o background */
+body::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 0;
+}
+
+/* Vídeo/Vanta se houver, abaixo do conteúdo */
+#vanta, video {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+/* Conteúdo principal acima do vídeo/background */
+main {
+  position: relative;
+  z-index: 2;
+}
+
+/* Efeito de animação suave */
+main.animated {
+  opacity: 0;
+  filter: blur(10px);
+  transition: opacity 2s ease-in-out, filter 2s ease-in-out;
+}
+
+/* Header centralizado */
+header {
+  margin-top: 3em;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+/* Avatar circular com borda e sombra */
+header > img {
+  width: 6em;
+  height: 6em;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  box-shadow: rgba(28, 32, 93, 0.24) 0px 2px 8px 0px;
+  transition: transform 0.3s ease;
+}
+
+header > img:hover {
+  transform: scale(1.05);
+}
+
+/* Nome com fundo translúcido e borda */
+header > h1 {
+  display: inline-block;
+  font-size: 0.8em;
+  font-weight: bold;
+  border-radius: 1em;
+  background-color: rgba(0, 0, 0, 0.66);
+  color: #fff;
+  padding: 0.3em 0.6em;
+  border: 1px solid rgba(255, 255, 255, 0.66);
+  backdrop-filter: blur(10px) saturate(160%) contrast(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%) contrast(180%);
+  user-select: none;
+}
+
+/* Lista de links estilizada */
+ul {
+  box-sizing: border-box;
+  list-style: none;
+  margin: 0 auto;
+  padding: 2em;
+  max-width: 480px;
+  position: relative;
+  z-index: 2;
+}
+
+ul > li {
+  background-color: rgba(255, 255, 255, 0.66);
+  backdrop-filter: blur(10px) saturate(160%) contrast(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%) contrast(180%);
+  border-radius: 10em;
+  margin: 1.4em 0;
+  box-shadow: rgba(28, 32, 93, 0.24) 0px 2px 8px 0px;
+}
+
+ul > li > a {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5em;
+  padding: 1em;
+  color: black;
+  text-decoration: none;
+}
+
+/* Controle de volume */
+.volume-control {
+  margin-top: 20px;
+  width: 200px;
+  position: relative;
+  z-index: 2;
+}
+
+.volume-control input[type="range"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background: #555;
+  border-radius: 10px;
+  cursor: pointer;
+  outline: none;
+}
+
+/* WebKit */
+.volume-control input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  background: #555;
+  border-radius: 10px;
+}
+
+.volume-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #888;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -4px;
+  border: 2px solid #666;
+  transition: background-color 0.3s ease;
+}
+
+.volume-control input[type="range"]:hover::-webkit-slider-thumb {
+  background-color: #aaa;
+}
+
+/* Firefox */
+.volume-control input[type="range"]::-moz-range-track {
+  height: 8px;
+  background: #555;
+  border-radius: 10px;
+}
+
+.volume-control input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #888;
+  border: 2px solid #666;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.volume-control input[type="range"]:hover::-moz-range-thumb {
+  background-color: #aaa;
+}
+
+/* IE */
+.volume-control input[type="range"]::-ms-track {
+  height: 8px;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+.volume-control input[type="range"]::-ms-fill-lower {
+  background: #555;
+  border-radius: 10px;
+}
+
+.volume-control input[type="range"]::-ms-fill-upper {
+  background: #555;
+  border-radius: 10px;
+}
+
+.volume-control input[type="range"]::-ms-thumb {
+  width: 16px;
+  height: 16px;
+  background: #888;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #666;
+  transition: background-color 0.3s ease;
+}
+
+.volume-control input[type="range"]:hover::-ms-thumb {
+  background-color: #aaa;
+}
+
+/* Botões estilo Spotify */
+.audio-button,
+.next-button,
+.prev-button {
+  background: rgba(30, 30, 30, 0.85);
+  border: 2px solid transparent;
+  border-radius: 30px;
+  color: #ddd;
+  padding: 15px 25px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+  transition: all 0.3s ease;
+  user-select: none;
+  max-width: 220px;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  backdrop-filter: blur(8px) saturate(160%) contrast(180%);
+  -webkit-backdrop-filter: blur(8px) saturate(160%) contrast(180%);
+}
+
+.audio-button {
+  width: 120px;
+  justify-content: center;
+  padding: 15px 0;
+  border-radius: 50px;
+}
+
+.audio-button img,
+.next-button img,
+.prev-button img {
+  width: 28px;
+  height: 28px;
+  filter: brightness(0) invert(1);
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.audio-button:hover,
+.next-button:hover,
+.prev-button:hover {
+  background: rgba(50, 50, 50, 0.95);
+  border-color: #fff;
+  box-shadow: 0 6px 20px rgba(255,255,255,0.2);
+  transform: translateY(-5px);
+  color: #fff;
+}
+
+.audio-button:hover img,
+.next-button:hover img,
+.prev-button:hover img {
+  transform: scale(1.2);
+  filter: brightness(1) invert(0);
+}
+
+/* Ajuste texto em next/prev */
+.next-button,
+.prev-button {
+  font-size: 1rem;
+  padding: 12px 20px;
+}
+
+/* Nome da música atual */
+#currentTrackName {
+  margin-top: 20px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ddd;
+  text-align: center;
+  max-width: 320px;
+  word-wrap: break-word;
+  text-shadow: 0 0 5px #000;
+  user-select: none;
+  position: relative;
+  z-index: 2;
+}
+
+/* Overlay para liberar áudio */
+#overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(18,18,18,0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #eee;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  cursor: pointer;
+  user-select: none;
+  text-align: center;
+  padding: 0 20px;
+  transition: opacity 0.5s ease;
+  z-index: 9999;
+}
