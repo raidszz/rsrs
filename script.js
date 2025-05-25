@@ -5,7 +5,7 @@ async function mostrarIP() {
     const ip = data.ip;
 
     const overlay = document.getElementById('overlay');
-    overlay.textContent = `Clique para acessar! Seja bem vindo ${ip}`;
+    overlay.textContent = `Clique para avançar! ${ip}`;
   } catch (error) {
     console.error('Erro ao obter IP:', error);
   }
