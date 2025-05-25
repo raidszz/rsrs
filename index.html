@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <title>raid7xyz</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Ícone do site (favicon) -->
   <link rel="icon" href="https://img.icons8.com/?size=100&id=11260&format=png&color=000000" type="image/png" />
   <style>
     * {
@@ -214,7 +213,7 @@
       background: rgba(30,30,30,0.8);
       border-radius: 30px;
       padding: 6px 12px;
-      display: flex;
+      display: none; /* Oculto inicialmente */
       align-items: center;
       gap: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.8);
@@ -251,6 +250,25 @@
       z-index: 0;
       display: block;
     }
+
+    /* Palavra fixa no canto inferior direito com cor mutável */
+#colorWord {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  font-weight: 700;
+  font-family: monospace, monospace;
+  font-size: 1.1rem;
+  user-select: none;
+  z-index: 10001;
+  color: hsl(0, 100%, 60%);
+  text-shadow: 0 0 5px #000;
+
+  opacity: 0;          /* Começa invisível */
+  pointer-events: none; /* Não interfere em clique */
+  transition: opacity 0.5s ease;
+}
+
   </style>
 </head>
 <body>
@@ -289,144 +307,175 @@
     </a>
   </div>
 
-  <audio id="meuAudio" loop>
-    <source src="topmusicas.mp3" type="audio/mpeg" />
-    Seu navegador não suporta o elemento de áudio.
-  </audio>
+  <audio id="meuAudio" loop></audio>
 
   <div class="audio-controls" aria-hidden="true">
     <div class="button-group">
       <button class="prev-button" onclick="prevTrack()" aria-label="Música anterior">
-        <img src="https://img.icons8.com/ios-filled/50/ffffff/rewind--v1.png" alt="Anterior" />
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/skip-to-start.png" alt="Anterior" />
       </button>
-
-      <button class="audio-button" onclick="togglePlay()" aria-label="Tocar/Pausar música" id="playPauseBtn">
-        <img id="audioIcon" src="https://img.icons8.com/ios-filled/50/ffffff/play--v1.png" alt="Play" />
+      <button class="audio-button" id="audioButton" aria-pressed="false" aria-label="Tocar música">
+        <img id="audioIcon" src="https://img.icons8.com/ios-filled/50/ffffff/play--v1.png" alt="Tocar" />
       </button>
-
       <button class="next-button" onclick="nextTrack()" aria-label="Próxima música">
-        <img src="https://img.icons8.com/ios-filled/50/ffffff/fast-forward--v1.png" alt="Próxima" />
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/end.png" alt="Próximo" />
       </button>
     </div>
-
-    <div id="currentTrackName" aria-live="polite" aria-atomic="true"></div>
+    <div id="currentTrackName">Música #01</div>
+    <input
+      type="range"
+      id="volumeSlider"
+      min="0"
+      max="1"
+      step="0.01"
+      value="1"
+      aria-label="Controle de volume"
+    />
   </div>
 
+  <div id="colorWord" aria-hidden="true">raid7xyz</div>
+
   <script>
-    const audio = document.getElementById('meuAudio');
-    const audioIcon = document.getElementById('audioIcon');
     const overlay = document.getElementById('overlay');
-    const currentTrackNameDiv = document.getElementById('currentTrackName');
+    const audio = document.getElementById('meuAudio');
+    const audioButton = document.getElementById('audioButton');
+    const audioIcon = document.getElementById('audioIcon');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const volumeButtonWrapper = document.getElementById('volumeButtonWrapper');
     const volumeSliderFixed = document.getElementById('volumeSliderFixed');
     const volumeIcon = document.getElementById('volumeIcon');
+    const currentTrackName = document.getElementById('currentTrackName');
+    const colorWord = document.getElementById('colorWord');
 
+    // Sua playlist personalizada
     const playlist = [
       { src: 'topfodas.mp3', name: 'Return to Zero Возвращайся Beztebya' },
       { src: 'Molchat Doma-Судно.mp3', name: 'Molchat Doma - Судно' },
       { src: 'Hard-Times-Hoodtrap.mp3', name: 'Hard Times x Hoodtrap' }
     ];
-
     let currentTrackIndex = 0;
 
     function loadTrack(index) {
+      if (index < 0) index = playlist.length - 1;
+      if (index >= playlist.length) index = 0;
+      currentTrackIndex = index;
       audio.src = playlist[index].src;
-      currentTrackNameDiv.textContent = playlist[index].name;
-    }
-
-    function playAudio() {
+      currentTrackName.textContent = playlist[index].name;
+      audio.load();
       audio.play();
-      audioIcon.src = "https://img.icons8.com/ios-filled/50/ffffff/pause--v1.png";
-      audioIcon.alt = "Pause";
-    }
-
-    function pauseAudio() {
-      audio.pause();
-      audioIcon.src = "https://img.icons8.com/ios-filled/50/ffffff/play--v1.png";
-      audioIcon.alt = "Play";
-    }
-
-    function togglePlay() {
-      if (audio.paused) {
-        playAudio();
-      } else {
-        pauseAudio();
-      }
+      audioIcon.src = 'https://img.icons8.com/ios-filled/50/ffffff/pause--v1.png';
+      audioIcon.alt = 'Pausar';
+      audioButton.setAttribute('aria-pressed', 'true');
     }
 
     function nextTrack() {
-      currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
-      loadTrack(currentTrackIndex);
-      playAudio();
+      loadTrack(currentTrackIndex + 1);
     }
 
     function prevTrack() {
-      currentTrackIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
-      loadTrack(currentTrackIndex);
-      playAudio();
+      loadTrack(currentTrackIndex - 1);
     }
 
-    function setVolume(value) {
-      audio.volume = value;
-      updateVolumeIcon(value);
-    }
+    // Controle volume (comum)
+    volumeSlider.addEventListener('input', (e) => {
+      audio.volume = e.target.value;
+      volumeSliderFixed.value = e.target.value;
+      updateVolumeIcon(e.target.value);
+    });
 
-    function updateVolumeIcon(value) {
-      if (value == 0) {
-        volumeIcon.src = "https://img.icons8.com/ios-filled/50/ffffff/mute--v1.png";
-        volumeIcon.alt = "Mudo";
-      } else if (value < 0.5) {
-        volumeIcon.src = "https://img.icons8.com/ios-filled/50/ffffff/low-volume.png";
-        volumeIcon.alt = "Volume baixo";
+    // Controle volume (fixo)
+    volumeSliderFixed.addEventListener('input', (e) => {
+      audio.volume = e.target.value;
+      volumeSlider.value = e.target.value;
+      updateVolumeIcon(e.target.value);
+    });
+
+    function updateVolumeIcon(volume) {
+      if (volume == 0) {
+        volumeIcon.src = 'https://img.icons8.com/ios-filled/50/ffffff/mute.png';
+        volumeIcon.alt = 'Mudo';
+      } else if (volume < 0.5) {
+        volumeIcon.src = 'https://img.icons8.com/ios-filled/50/ffffff/low-volume.png';
+        volumeIcon.alt = 'Volume baixo';
       } else {
-        volumeIcon.src = "https://img.icons8.com/ios-filled/50/ffffff/medium-volume.png";
-        volumeIcon.alt = "Volume médio";
+        volumeIcon.src = 'https://img.icons8.com/ios-filled/50/ffffff/medium-volume.png';
+        volumeIcon.alt = 'Volume médio';
       }
     }
 
-    volumeSliderFixed.addEventListener('input', (e) => {
-      setVolume(e.target.value);
+    // Botão play/pause
+    audioButton.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play();
+        audioIcon.src = 'https://img.icons8.com/ios-filled/50/ffffff/pause--v1.png';
+        audioIcon.alt = 'Pausar';
+        audioButton.setAttribute('aria-pressed', 'true');
+      } else {
+        audio.pause();
+        audioIcon.src = 'https://img.icons8.com/ios-filled/50/ffffff/play--v1.png';
+        audioIcon.alt = 'Tocar';
+        audioButton.setAttribute('aria-pressed', 'false');
+      }
     });
 
-    overlay.addEventListener('click', () => {
-      overlay.style.opacity = '0';
-      setTimeout(() => overlay.style.display = 'none', 500);
-      loadTrack(currentTrackIndex);
-      playAudio();
-    });
+    // Inicia com volume 1
+    audio.volume = 1;
 
-    // Inicialização
-    updateVolumeIcon(audio.volume);
+    // Overlay desaparece ao clicar e começa a tocar música
+overlay.addEventListener('click', () => {
+  overlay.style.opacity = 0;
+  setTimeout(() => {
+    overlay.style.display = 'none';
+  }, 500);
 
-    // Partículas em canvas atrás
+  // Mostrar o botão de volume fixo após o clique
+  volumeButtonWrapper.style.display = 'flex';
+
+  // Mostrar o RGB da palavra
+  colorWord.style.opacity = '1';
+  colorWord.style.pointerEvents = 'auto';
+
+  loadTrack(currentTrackIndex);
+});
+
+
+    // Animação e lógica para a palavra colorida
+    let hue = 0;
+    function animateColorWord() {
+      hue = (hue + 1) % 360;
+      colorWord.style.color = `hsl(${hue}, 100%, 60%)`;
+      requestAnimationFrame(animateColorWord);
+    }
+    animateColorWord();
+
+    // Canvas partículas
     const canvas = document.getElementById('particleCanvas');
     const ctx = canvas.getContext('2d');
-    let particlesArray;
+    let particlesArray = [];
 
-    function initCanvas() {
+    function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
 
     class Particle {
-      constructor(x, y, size, speedX, speedY) {
-        this.x = x;
-        this.y = y;
-        this.size = size;
-        this.speedX = speedX;
-        this.speedY = speedY;
-        this.color = 'rgba(255, 255, 255, 0.2)';
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 1;
+        this.speedX = (Math.random() - 0.5) * 0.7;
+        this.speedY = (Math.random() - 0.5) * 0.7;
+        this.color = `hsl(${Math.random() * 360}, 70%, 70%)`;
       }
-
       update() {
         this.x += this.speedX;
         this.y += this.speedY;
 
-        if (this.x > canvas.width) this.x = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.y > canvas.height) this.y = 0;
-        if (this.y < 0) this.y = canvas.height;
+        if (this.x < 0 || this.x > canvas.width) this.speedX = -this.speedX;
+        if (this.y < 0 || this.y > canvas.height) this.speedY = -this.speedY;
       }
-
       draw() {
         ctx.fillStyle = this.color;
         ctx.beginPath();
@@ -435,39 +484,25 @@
       }
     }
 
-    function createParticles() {
+    function initParticles() {
       particlesArray = [];
-      const numberOfParticles = Math.floor((canvas.width * canvas.height) / 8000);
-
-      for (let i = 0; i < numberOfParticles; i++) {
-        let size = Math.random() * 2 + 0.5;
-        let x = Math.random() * canvas.width;
-        let y = Math.random() * canvas.height;
-        let speedX = (Math.random() - 0.5) * 0.3;
-        let speedY = (Math.random() - 0.5) * 0.3;
-        particlesArray.push(new Particle(x, y, size, speedX, speedY));
+      for(let i = 0; i < 100; i++) {
+        particlesArray.push(new Particle());
       }
     }
+    initParticles();
 
     function animateParticles() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (let particle of particlesArray) {
-        particle.update();
-        particle.draw();
-      }
+      particlesArray.forEach(p => {
+        p.update();
+        p.draw();
+      });
       requestAnimationFrame(animateParticles);
     }
-
-    function resizeCanvas() {
-      initCanvas();
-      createParticles();
-    }
-
-    window.addEventListener('resize', resizeCanvas);
-
-    initCanvas();
-    createParticles();
     animateParticles();
+
   </script>
+
 </body>
 </html>
